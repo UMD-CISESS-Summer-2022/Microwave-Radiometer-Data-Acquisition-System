@@ -1,0 +1,7 @@
+center: azi = 0, ele = -3.75
+
+azi step = 1
+ele step = 2.5
+
+azi range = -20, 20
+ele range = -15, 10	
