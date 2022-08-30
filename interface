@@ -18,8 +18,7 @@ import scipy.io
 import scipy.interpolate
 import numpy as np
 import math
-# import lmfit
-# from lmfit.lineshapes import gaussian2d, lorentzian
+
 
 from SerialCommunication import SerialCommunicator
 from SerialTransferCommunication import SerialTransferCommunicator
@@ -44,14 +43,7 @@ XLIM = 800
 def recordOnClick():
 	param = {}
 	try:
-		# param = {	
-		# 	"theta_azim": float(azimuth_angle.get()) if azimuth_angle.get() else None, 
-		# 	"theta_elev": float(elevation_angle.get()) if elevation_angle.get() else None, 
-		# 	"integ_time": float(integration_time.get()) if integration_time.get() else None, 
-		# 	"duration": float(record_duration_s.get()),
-		# 	"db": float(db.get() if db else None),
-		# 	"save_to": folder_button.cget("text")
-		# }
+
 		if azimuth_angle.get():
 			param["theta_azim"] = float(azimuth_angle.get())
 		if elevation_angle.get():
@@ -83,7 +75,6 @@ def connectOnClick():
 	except:
 		pass
 
-	# stc = SerialTransferCommunicator(port=portName.get(), recorder=stRecorder)
 	stc = SerialCommunicator(port=portName.get(), recorder=stRecorder)
 
 	serialTransferThread = Thread(target=stc.start)
@@ -95,13 +86,6 @@ def folderOnClick():
 	folder_button.configure(text=dir.replace(cwd,"."))
 	
 
-# def gui_loop():
-# 	while True:
-		
-# 		global record_button
-# 		global data_frequency
-		# record_button.configure(fg="red" if stRecorder.on else "green")
-		# data_frequency.configure(text=str(stc.freq))
 
 
 # fetching data from serical communicator
@@ -109,13 +93,11 @@ def animation_data():
 	x = [i for i in range(XLIM)]
 	y = [0 for _ in range(XLIM)]
 	while True:
-		# print(connected)
 		if connected:
 			try:
 				demod = stc.read()
 			except:
 				demod = 0
-			# print(demod)
 			record_button.configure(fg="red" if stRecorder.on else "green")
 			data_frequency.configure(text=str(stc.freq if stc else 0))
 			input.configure(text=str(demod))
@@ -125,7 +107,6 @@ def animation_data():
 # ploting 
 def animation_frame(data):
 	x, y = data[0], data[1]
-	# print(y[-1])
 
 	line.set_data(x, y)
 	return line,
@@ -147,23 +128,19 @@ def open_file():
 
 # plotting 2d map
 def print_2d(data):
-	# print(data)
 	x = data[:,0]
 	y = data[:,1]
 	a = -data[:,2]
-	# print("HERE::", type(x), type(y), type(a))
+	
 	xi, yi = np.mgrid[x.min():x.max():500j, y.min():y.max():500j]
 	grid_x, grid_y = np.mgrid[x.min():x.max():200j, y.min():y.max():200j]
-	# grid_x = [x.min()]
+	
 
-	# rbf = scipy.interpolate.RBFInterpolator((x,y), a)
 	griddata = scipy.interpolate.griddata(np.array([x,y]).T, a, (grid_x, grid_y), method='linear')
 	params = fitgaussian(griddata)
 	fit = gaussian(*params)
 	print(params)
 
-	# mxm = a.max()
-	# db = np.log10(a/mxm)
 
 	plot3.clear()
 	plot3.scatter(data[:,0], data[:,1], a)
@@ -194,9 +171,7 @@ def open_file_2():
 
 	for file in files:
 		mat = scipy.io.loadmat(file)
-		# match = re.search(r'MiRES_\d+-\d+_az_(-?\d+\.\d+)_el_(-?\d+\.\d+).mat$', file)
-		# az = float(match.group(1))
-		# el = float(match.group(2))
+		
 		az = float(mat["theta_azim"])
 		el = float(mat["theta_elev"])
 
@@ -216,26 +191,9 @@ plot1 = fig.add_subplot(211, xlim=(0,XLIM), ylim=(-50, 50))
 plot2 = fig.add_subplot(212)
 line, = plot1.plot([], [])
 
-# fig = Figure(figsize=(16,12), dpi=50)
-# plot1 = fig.add_subplot(211)
-# plot2 = fig.add_subplot(212)
 
-
-# plot1.set_ylim([0, 120])
-
-
-# sc = SerialCommunicator()
 stRecorder = Recorder()
 stc = None
-# stc = SerialTransferCommunicator(port=portName, recorder=stRecorder)
-# stc = SerialCommunicator(port="/dev/cu.usbserial-110", recorder=stRecorder)
-
-# serialTransferThread = Thread(target=stc.start)
-# serialTransferThread.start()
-
-
-# guiThread = Thread(target=gui_loop)
-# guiThread.start()
 
 
 
@@ -299,23 +257,18 @@ db_label = Label(parameterFrame, text="db:", font=("Helvatical", 20))
 db_label.grid(row=4, column=0)
 
 azimuth_angle = Entry(parameterFrame, width=5)
-# azimuth_angle.insert(0, 0)
 azimuth_angle.grid(row=0, column=1)
 elevation_angle = Entry(parameterFrame, width=5)
-# elevation_angle.insert(0, 90)
 elevation_angle.grid(row=1, column=1)
 integration_time = Entry(parameterFrame, width=5)
-# integration_time.insert(0, 10)
 integration_time.grid(row=2, column=1)
 record_duration_s = Entry(parameterFrame, width=5)
-# record_duration_s.insert(0, 10)
 record_duration_s.grid(row=3, column=1)
 db = Entry(parameterFrame, width=5)
 record_duration_s.insert(0, 5)
 db.grid(row=4, column=1)
 
-# save_to = StringVar()
-# save_to.set("./")
+
 folder_button = Button(parameterFrame, text="./", command=folderOnClick)
 folder_button.grid(row=5,column=1)
 
@@ -347,13 +300,6 @@ file_button = Button(tab2, text="Select a File", command=open_file_2)
 file_button.grid(row=1,column=0)
 
 
-# Graphing ####################################
-# canvas2 = FigureCanvasTkAgg(fig2, master = tab1)
-# # canvas.draw_idle()
-# canvas2.get_tk_widget().grid(row=3, column=0, columnspan=2)
-# canvas2.draw_idle()
-
-
 
 
 def on_closing():
@@ -367,39 +313,6 @@ def on_closing():
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 root.mainloop()
-
-
-
-
-
-# signal frame ##########################
-# signalFrame = LabelFrame(root, text="Signal Simulator", width=400, height=300, padx=50, pady=50)
-# signalFrame.grid(row=0, column=1)
-
-# global signalType
-# signalName = StringVar()
-# signalName.set('zero')
-
-# Radiobutton(signalFrame, text="Zero", variable=signalName, value="zero", anchor=W).grid(row=0, column=0, sticky=W+E)
-# Radiobutton(signalFrame, text="Sine", variable=signalName, value="sine", anchor=W).grid(row=1, column=0, sticky=W+E)
-# Radiobutton(signalFrame, text="Square", variable=signalName, value="square", anchor=W).grid(row=2, column=0, sticky=W+E)
-# Radiobutton(signalFrame, text="Pulse", variable=signalName, value="pulse", anchor=W).grid(row=2, column=0, sticky=W+E)
-
-# Label(signalFrame, text="Sample Frequency:").grid(row=4, column=0)
-# sampleFrequencyEntry = Entry(signalFrame, width=8).grid(row=4, column=1)
-# Label(signalFrame, text="Hrz").grid(row=4, column=2)
-
-
-
-# Button(signalFrame, text="Set", command=lambda: setup(signalName.get())).grid(row=5, column=2, pady=(20,0))
-
-
-# figure frame ##########################
-# figureFrame = LabelFrame(root, text="Figure", width=400, height=300)
-# figureFrame.grid(row=1,column=1)
-
-
-
 
 
 

@@ -37,29 +37,3 @@ def fitgaussian(data):
     return p
 
 
-
-
-# # Create the gaussian data
-# Xin, Yin = np.mgrid[0:201, 0:201]
-# print(Xin, Yin)
-# data = gaussian(3, 100, 100, 20, 40)(Xin, Yin) # + np.random.random(Xin.shape)
-# print(np.shape(data))
-# plt.matshow(data, cmap=plt.cm.gist_earth_r)
-
-# params = fitgaussian(data)
-# fit = gaussian(*params)
-
-# plt.contour(fit(*np.indices(data.shape)), cmap=plt.cm.copper)
-# ax = plt.gca()
-# (height, x, y, width_x, width_y) = params
-
-# plt.text(0.95, 0.05, """
-# x : %.1f
-# y : %.1f
-# width_x : %.1f
-# width_y : %.1f""" %(x, y, width_x, width_y),
-#         fontsize=16, horizontalalignment='right',
-#         verticalalignment='bottom', transform=ax.transAxes)
-        
-
-# plt.show()
